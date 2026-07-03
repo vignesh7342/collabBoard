@@ -6,6 +6,8 @@ const requiredVariables = [
     "DB_NAME",
     "DB_PASSWORD",
     "DB_PORT",
+    "JWT_SECRET",
+    "JWT_EXPIRES_IN"
 ];
 
 for (const variable of requiredVariables) {
@@ -32,6 +34,8 @@ const config = {
         database: process.env.DB_NAME,
         password: process.env.DB_PASSWORD,
         port: process.env.DB_PORT,
+        jwtSecret: process.env.JWT_SECRET,
+        jwtExpiresIn: process.env.JWT_EXPIRES_IN   
     },
 };
 

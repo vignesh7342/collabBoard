@@ -10,11 +10,15 @@ const roomRoutes=require("./routes/rooms");
 
 const errorHandler=require("./middlewares/errorHandler");
 
+const userRoutes = require("./routes/users");
+
+app.use("/users", userRoutes);
+
+app.use("/rooms", roomRoutes);
+
 app.get("/", (req, res) =>{
     res.send("Welcome to CollabBoard");
 });
-
-app.use("/rooms", roomRoutes);
 
 app.listen(3000, () => {
     logger.info(`Server started on port 3000`);
