@@ -2,14 +2,14 @@ const roomService = require("../services/roomService");
 const AppError = require("../utils/AppError");
 const catchAsync = require("../utils/catchAsync");
 
-const createRoom = catchAsync(
-    async(req, res) => {
-        const room = await roomService.createRoom(
-            req.body.name
-        );
-        res.status(201).json(room);
-    }
-);
+const createRoom = catchAsync(async (req, res) => {
+    const room = await roomService.createRoom(
+        req.body.name,
+        req.user.id
+    );
+
+    res.status(201).json(room);
+});
 
 
 const getRooms = catchAsync(
@@ -36,7 +36,8 @@ const updateRoom = catchAsync(
     async (req, res) => {
         const room = await roomService.updateRoom(
             Number(req.params.id),
-            req.body.name
+            req.body.name,
+            req.user.id
         );
         if(!room){
             throw new AppError(
@@ -50,7 +51,7 @@ const updateRoom = catchAsync(
 
 const deleteRoom = catchAsync(
     async (req,res) => {
-        const deleted = await roomService.deleteRoom(Number(req.params.id));
+        const deleted = await roomService.deleteRoom(Number(req.params.id), req.user.id);
         if(!deleted){
             throw new AppError(
                 "Room not found",

@@ -1,5 +1,7 @@
 const express = require("express");
 
+const authenticate = require("../middlewares/authMiddleware");
+
 const validateRoom = require(
     "../middlewares/validateRoom"
 );
@@ -20,7 +22,7 @@ const {
 
 const validateIdea = require("../middlewares/validateIdea");
 
-router.post("/",validateRoom,createRoom);
+router.post("/",authenticate,validateRoom,createRoom);
 
 router.get("/", getRooms);
 
@@ -28,12 +30,12 @@ router.get("/:id/winner", winner);
 
 router.get("/:id", getRoomById);
 
-router.delete("/:id", deleteRoom);
+router.delete("/:id",authenticate,deleteRoom);
 
-router.put("/:id",validateRoom,updateRoom);
+router.put("/:id",authenticate,validateRoom,updateRoom);
 
-router.post("/:id/ideas",validateIdea,addIdea);
+router.post("/:id/ideas",authenticate,validateIdea,addIdea);
 
-router.post("/:id/ideas/:ideaId/vote", voteIdea);
+router.post("/:id/ideas/:ideaId/vote",authenticate,voteIdea);
 
 module.exports = router;

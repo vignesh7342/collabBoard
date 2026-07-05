@@ -1,5 +1,23 @@
 const pool = require("../database/db");
 
+const checkRoomOwnership = async (roomId, userId) => {
+    const roomResult = await pool.query(
+        "SELECT * FROM rooms WHERE id = $1",
+        [roomId]
+    );
+    if (roomResult.rowCount === 0) {
+        throw new AppError("Room not found", 404);
+    }
+    const room = roomResult.rows[0];
+    if (room.user_id !== userId) {
+        throw new AppError(
+            "You are not authorized to perform this action",
+            403
+        );
+    }
+    return room;
+};
+
 // CRUD operations
 const getAllRooms = async () => {
     const result = await pool.query(
@@ -16,28 +34,37 @@ const getRoomById = async (id) => {
     return result.rows[0];
 };
 
-const createRoom = async (name) => {
+const createRoom = async (name, userId) => {
     const result = await pool.query(
-        'INSERT INTO rooms(name) VALUES($1) RETURNING *',
-        [name.trim()]
+        'INSERT INTO rooms(name, user_id) VALUES($1, $2) RETURNING *',
+        [name.trim(), userId]
     );
     return result.rows[0];
 };
 
-const updateRoom = async (id, name) => {
+const updateRoom = async (id, name, userId) => {
+    await checkRoomOwnership(id, userId);
+
     const result = await pool.query(
-        'UPDATE rooms SET name = $1 WHERE id = $2 RETURNING *',
+        `UPDATE rooms
+         SET name = $1
+         WHERE id = $2
+         RETURNING *`,
         [name.trim(), id]
     );
+
     return result.rows[0];
 };
 
-const deleteRoom = async(id) => {
+const deleteRoom = async (id, userId) => {
+    await checkRoomOwnership(id, userId);
+
     const result = await pool.query(
-        'DELETE FROM rooms WHERE id=$1',
+        "DELETE FROM rooms WHERE id = $1",
         [id]
     );
-    return result.rowCount>0;
+
+    return result.rowCount > 0;
 };
 
 // Idea management

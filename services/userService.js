@@ -4,9 +4,7 @@ const pool = require("../database/db");
 
 const AppError = require("../utils/AppError");
 
-const jwt = require("jsonwebtoken");
-
-const config = require("../config/config");
+const { generateToken } = require("../utils/jwt");
 
 const createUser = async ({ name, email, password }) => {
     const existingUser = await pool.query(
@@ -57,15 +55,7 @@ const loginUser = async ({ email, password }) => {
         );
     }
 
-    const token = jwt.sign(
-        {
-            id: existingUser.id
-        },
-        config.jwtSecret,
-        {
-            expiresIn: config.jwtExpiresIn
-        }
-    );
+    const token = generateToken(existingUser.id);
 
     return {
         token,
