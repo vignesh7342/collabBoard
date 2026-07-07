@@ -1,5 +1,5 @@
 const userService = require("../services/userService");
-const userService = require("../services/userService");
+
 const catchAsync = require("../utils/catchAsync");
 
 const createUser = catchAsync(async (req, res) => {

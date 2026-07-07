@@ -1,27 +1,35 @@
-const express=require("express");
+const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
 
-const app=express();
+const roomRoutes = require("./routes/rooms");
+const userRoutes = require("./routes/users");
+
+const errorHandler = require("./middlewares/errorHandler");
+
+const app = express();
+
+const server = http.createServer(app);
+
+const io = new Server(server);
 
 app.use(express.json());
 
-const logger = require("./utils/logger");
-
-const roomRoutes=require("./routes/rooms");
-
-const errorHandler=require("./middlewares/errorHandler");
-
-const userRoutes = require("./routes/users");
-
+app.use("/rooms", roomRoutes);
 app.use("/users", userRoutes);
 
-app.use("/rooms", roomRoutes);
+io.on("connection", (socket) => {
+    console.log("A user connected");
 
-app.get("/", (req, res) =>{
-    res.send("Welcome to CollabBoard");
-});
-
-app.listen(3000, () => {
-    logger.info(`Server started on port 3000`);
+    socket.on("disconnect", () => {
+        console.log("User disconnected");
+    });
 });
 
 app.use(errorHandler);
+
+const PORT = process.env.PORT || 3000;
+
+server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});

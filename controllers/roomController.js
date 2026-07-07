@@ -7,104 +7,75 @@ const createRoom = catchAsync(async (req, res) => {
         req.body.name,
         req.user.id
     );
-
     res.status(201).json(room);
 });
 
-
-const getRooms = catchAsync(
-async (req, res) => {
+const getRooms = catchAsync(async (req, res) => {
     const rooms = await roomService.getAllRooms();
     res.json(rooms);
 });
 
-const getRoomById = catchAsync(
-async (req, res) => {
+const getRoomById = catchAsync(async (req, res) => {
     const room = await roomService.getRoomById(
         Number(req.params.id)
     );
     if (!room) {
-        throw new AppError(
-            "Room not found",
-            404
-        );
+        throw new AppError("Room not found", 404);
     }
     res.json(room);
 });
 
-const updateRoom = catchAsync(
-    async (req, res) => {
-        const room = await roomService.updateRoom(
-            Number(req.params.id),
-            req.body.name,
-            req.user.id
-        );
-        if(!room){
-            throw new AppError(
-                "Room not found",
-                404
-            );
-        }
-        res.json(room);
+const updateRoom = catchAsync(async (req, res) => {
+    const room = await roomService.updateRoom(
+        Number(req.params.id),
+        req.body.name,
+        req.user.id
+    );
+    if(!room){
+        throw new AppError("Room not found", 404);
     }
-)
+    res.json(room);
+});
 
-const deleteRoom = catchAsync(
-    async (req,res) => {
-        const deleted = await roomService.deleteRoom(Number(req.params.id), req.user.id);
-        if(!deleted){
-            throw new AppError(
-                "Room not found",
-                404
-            );
-        }
-        res.json({
-            message:"Room deleted successfully"
-        });
+const deleteRoom = catchAsync(async (req,res) => {
+    const deleted = await roomService.deleteRoom(Number(req.params.id), req.user.id);
+    if(!deleted){
+        throw new AppError("Room not found", 404);
     }
-);
+    res.json({
+        message:"Room deleted successfully"
+    });
+});
 
-const voteIdea = catchAsync(
-async (req, res) => {
+const voteIdea = catchAsync(async (req, res) => {
     const idea = await roomService.voteIdea(
         Number(req.params.id),
         Number(req.params.ideaId)
     );
     if (!idea) {
-        throw new AppError(
-            "Room or Idea not found",
-            404
-        );
+        throw new AppError("Room or Idea not found", 404);
     }
     res.json(idea);
 });
 
-const voteIdea = (req, res) => {
-    const idea = roomService.voteIdea(
-        Number(req.params.id),
-        Number(req.params.ideaId)
-    );
 
-    if (!idea) {
-        throw new AppError(
-            "Room or Idea not found",
-            404
-        );
-    }
-
-    res.json(idea);
-};
-
-const winner = catchAsync(
-async (req, res) => {
+const winner = catchAsync(async (req, res) => {
     const idea = await roomService.getWinner(
         Number(req.params.id)
     );
     if (!idea) {
-        throw new AppError(
-            "No winner found",
-            404
-        );
+        throw new AppError("No winner found", 404);
+    }
+    res.json(idea);
+});
+
+const addIdea = catchAsync(async (req, res) => {
+    const idea = await roomService.addIdea(
+        Number(req.params.id),
+        req.body.text
+    );
+    if (!idea) {
+        throw new AppError("Room not found", 404);
     }
     res.json(idea);
 });
@@ -115,7 +86,7 @@ module.exports = {
     getRoomById,
     updateRoom,
     deleteRoom,
-    addIdea,
-    voteIdea,
-    winner
+    addIdea,   
+    voteIdea,  
+    winner     
 };

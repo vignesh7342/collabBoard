@@ -69,7 +69,7 @@ const deleteRoom = async (id, userId) => {
 
 // Idea management
 const addIdea = async (roomId, text) => {
-    const room = getRoomById(roomId);
+    const room = await getRoomById(roomId);
     if(!room)
         return null;
 
@@ -82,6 +82,10 @@ const addIdea = async (roomId, text) => {
 }
 
 const voteIdea = async (roomId, ideaId) => {
+    // Check if room exists
+    const room = await getRoomById(roomId);
+    if (!room) return null;
+    
     const result = await pool.query(
         `UPDATE ideas SET votes = votes + 1 WHERE id = $1 AND room_id = $2
          RETURNING *`,
