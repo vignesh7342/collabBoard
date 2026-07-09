@@ -1,6 +1,8 @@
+const { get } = require("../routes/rooms");
 const roomService = require("../services/roomService");
 const AppError = require("../utils/AppError");
 const catchAsync = require("../utils/catchAsync");
+const { getIO } = require("../utils/socketManager");
 
 const createRoom = catchAsync(async (req, res) => {
     const room = await roomService.createRoom(
@@ -48,14 +50,25 @@ const deleteRoom = catchAsync(async (req,res) => {
 });
 
 const voteIdea = catchAsync(async (req, res) => {
-    const idea = await roomService.voteIdea(
-        Number(req.params.id),
-        Number(req.params.ideaId)
+
+    const updatedIdea = await roomService.voteIdea(
+        req.params.id,
+        req.params.ideaId
     );
-    if (!idea) {
+
+    if (!updatedIdea) {
         throw new AppError("Room or Idea not found", 404);
     }
-    res.json(idea);
+
+    const io = getIO();
+
+    io.to(req.params.id).emit(
+        "voteUpdated",
+        updatedIdea
+    );
+
+    res.json(updatedIdea);
+
 });
 
 
@@ -77,7 +90,9 @@ const addIdea = catchAsync(async (req, res) => {
     if (!idea) {
         throw new AppError("Room not found", 404);
     }
-    res.json(idea);
+    const io=getIO();
+    io.to(req.params.id).emit("ideaCreated", idea);
+    res.status(201).json(idea);
 });
 
 module.exports = {
